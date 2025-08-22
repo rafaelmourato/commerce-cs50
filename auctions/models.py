@@ -18,10 +18,13 @@ class Listing(models.Model):
     Winner = models.ForeignKey(User, on_delete=models.PROTECT, related_name="winner", null=True)
     Title = models.CharField(max_length=64)
     Description = models.TextField(blank=True)
-    InitialBid = models.DecimalField(max_digits = 10, decimal_places=2)
+    CurrentBid = models.DecimalField(max_digits = 10, decimal_places=2)
     Image = models.URLField(max_length=500, blank=True, null=True)
-    category = models.CharField(choices=categories, null=True, blank=True, default= None)
+    Category = models.CharField(choices=categories, null=True, blank=True, default= None)
     Active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.Title}:"
 
 
 #comments: user(fkon.deletecascade), listing, content

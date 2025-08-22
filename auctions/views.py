@@ -1,15 +1,58 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Listing
 
+class ListingForm(forms.Form):
+    categories = [ ("",""),
+        ('Fash', 'Fashion'),
+        ('Toys', 'Toys'),
+        ('Elec', 'Electronics'),
+        ( 'Home', 'Home'),
+    ]
+    Title = forms.CharField(max_length=64)
+    Description = forms.CharField(widget=forms.Textarea)
+    CurrentBid = forms.DecimalField(max_digits = 10, decimal_places=2)
+    Image = forms.URLField(max_length=500, required=False)
+    Category = forms.ChoiceField(choices=categories, required=False)
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html",{
+        "listings": Listing.objects.all()
+    })
 
+@login_required
+def create_listing(request):
+    if request.method == "POST":
+        form = ListingForm(request.POST)
+        if form.is_valid():
+            listing = Listing(
+                Owner=request.user,
+                Title=form.cleaned_data["Title"],
+                Description=form.cleaned_data["Description"],
+                CurrentBid=form.cleaned_data["InitialBid"],
+                Image=form.cleaned_data["Image"],
+                Category=form.cleaned_data["Category"]
+            )
+            listing.save()
+            return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "auctions/createlisting.html",{
+            "form": ListingForm()
+        })
+
+def categories(request):
+    return render(request, "auctions/categories.html")
+
+def listing(request):
+    return render(request, "auctions/listing.html",{
+
+    })    
 
 def login_view(request):
     if request.method == "POST":
@@ -30,11 +73,9 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
-
 
 def register(request):
     if request.method == "POST":
