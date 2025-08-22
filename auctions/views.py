@@ -53,7 +53,13 @@ def listing(request, id):
     listing = Listing.objects.get(pk=id)
     return render(request, "auctions/listing.html",{
         "listing": listing
-    })    
+    }) 
+
+def watchlist(request):
+    return render(request, "auctions/watchlist.html")
+
+def bid(request):
+    return None
 
 def login_view(request):
     if request.method == "POST":
