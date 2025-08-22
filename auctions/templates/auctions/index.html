@@ -3,15 +3,19 @@
 {% block body %}
     <h2>Active Listings</h2>
     {% for listing in listings %}
+    {% if listing.Active == True %}
         <div>
             <div>
                 {{ listing.Image }}
             </div>
-            <div>
-                <h3>{{ listing.Title }}</h3>
-                <p>Price: {{ listing.CurrentBid }} </p>
-                <p> {{ listing.Description }} </p>
-            </div>
+            <a href="{% url 'listing' listing.id %}">
+                <div>
+                    <h3>{{ listing.Title }}</h3>
+                    <p>Price: {{ listing.CurrentBid }} </p>
+                    <p> {{ listing.Description }} </p>
+                </div>
+            </a>
         </div>
+    {% endif %}
     {% endfor %}
 {% endblock %}

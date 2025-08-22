@@ -26,7 +26,8 @@ It’s up to you to decide what fields each model should have, and what the type
 - [x] The default route of your web application should let users view all of the currently active auction listings. 
 - [x] For each active listing, this page should display (at minimum) the title, description, current price, and photo (if one exists for the listing).
 #### Listing Page
-- [] Clicking on a listing should take users to a page specific to that listing. On that page, users should be able to view all details about the listing, including the current price for the listing.
+- [x] Clicking on a listing should take users to a page specific to that listing. 
+- [] On that page, users should be able to view all details about the listing, including the current price for the listing.
 - [] If the user is signed in, the user should be able to add the item to their “Watchlist.” If the item is already on the watchlist, the user should be able to remove it.
 - [] If the user is signed in, the user should be able to bid on the item. The bid must be at least as large as the starting bid, and must be greater than any other bids that have been placed (if any). If the bid doesn’t meet those criteria, the user should be presented with an error.
 - [] If the user is signed in and is the one who created the listing, the user should have the ability to “close” the auction from this page, which makes the highest bidder the winner of the auction and makes the listing no longer active.

@@ -49,9 +49,10 @@ def create_listing(request):
 def categories(request):
     return render(request, "auctions/categories.html")
 
-def listing(request):
+def listing(request, id):
+    listing = Listing.objects.get(pk=id)
     return render(request, "auctions/listing.html",{
-
+        "listing": listing
     })    
 
 def login_view(request):

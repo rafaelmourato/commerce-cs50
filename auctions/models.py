@@ -15,7 +15,7 @@ class Listing(models.Model):
         ( 'Home', 'Home'),
     ]
     Owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
-    Winner = models.ForeignKey(User, on_delete=models.PROTECT, related_name="winner", null=True)
+    Winner = models.ForeignKey(User, on_delete=models.PROTECT, related_name="winner", null=True, blank=True)
     Title = models.CharField(max_length=64)
     Description = models.TextField(blank=True)
     CurrentBid = models.DecimalField(max_digits = 10, decimal_places=2)
