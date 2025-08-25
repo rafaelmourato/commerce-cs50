@@ -38,5 +38,6 @@ class Bid(models.Model):
     Bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bidding")
     Receiver = models.ForeignKey(Listing, on_delete=models.PROTECT, related_name="listingBid")
     Value = models.DecimalField(max_digits = 10, decimal_places=2)
+    
 
 # harvard - cs50commerce

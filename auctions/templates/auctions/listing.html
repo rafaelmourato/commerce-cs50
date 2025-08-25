@@ -5,7 +5,7 @@
 
 <div>
     <div>
-        {{ listing.Image }}
+        <img src="{{ listing.Image }}" alt="{{ listing.Title }}">
     </div>
     <div>
         <h4> {{ listing.Description }} </h4>
@@ -14,11 +14,21 @@
         {% if error %}
             <h5>{{ error }}</h5>
         {% endif %}
+        {% if listing.Owner == request.user %}
+        <form action="{% url 'endlisting' listing.id%}">
+            <input type="submit" value="End Bidding">
+        </form>
+        {% elif listing.Active == True %}
+        <form action="{% url 'watchlistAdd' listing.id %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Add to watchlist">
+        </form>
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
             <input type="text" placeholder="Bid" name="bid">
-            <input type="submit" placeholder="Place Bid">
+            <input type="submit" value="Place Bid">
         </form>
+        {% endif %}
     </div>
 
 </div>

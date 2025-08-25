@@ -6,7 +6,7 @@
     {% if listing.Active == True %}
         <div>
             <div>
-                {{ listing.Image }}
+                <img src="{{ listing.Image }}" alt="{{ listing.Title }}">
             </div>
             <a href="{% url 'listing' listing.id %}">
                 <div>

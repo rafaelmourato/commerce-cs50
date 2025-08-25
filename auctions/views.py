@@ -36,7 +36,7 @@ def create_listing(request):
                 Owner=request.user,
                 Title=form.cleaned_data["Title"],
                 Description=form.cleaned_data["Description"],
-                CurrentBid=form.cleaned_data["InitialBid"],
+                CurrentBid=form.cleaned_data["CurrentBid"],
                 Image=form.cleaned_data["Image"],
                 Category=form.cleaned_data["Category"]
             )
@@ -52,38 +52,56 @@ def categories(request):
 
 def listing(request, id):
     listing = Listing.objects.get(pk=id)
+    error = None
     if request.method == "POST":
-        bid = request.POST.get("bid")
-        if bid:
-            bid2 = float(bid)
-            if bid2 > listing.CurrentBid:
-                newBid = Bid(Bidder=request.user, Value=bid2, Receiver=listing)
-                newBid.save()
-                listing.CurrentBid = bid
-                listing.save()
-                return render(request, "auctions/listing.html",{
-                "listing": listing
-            })
+        if request.user.is_authenticated:
+            bid = request.POST.get("bid")
+            if bid:
+                bid2 = float(bid)
+                if bid2 > listing.CurrentBid:
+                    newBid = Bid(Bidder=request.user, Value=bid2, Receiver=listing)
+                    newBid.save()
+                    listing.Winner = request.user
+                    listing.CurrentBid = bid
+                    listing.save()
+                else:
+                    error = "Your bid must be higher than the current bid"
             else:
-                return render(request, "auctions/listing.html",{
-                "listing": listing,
-                "error": "Your bid must be higher than the current bid"
-            })
+                    error = "You must place a bid"
         else:
-            return render(request, "auctions/listing.html",{
-                "listing": listing,
-                "error": "You must place a bid"
-            })
+            error = "You must login to bid"
+    return render(request, "auctions/listing.html",{
+        "listing": listing,
+        "error": error
+    })
+
+def end_listing(request, id):
+    listing = Listing.objects.get(pk=id)
+    listing.Active = False
+    listing.save()
+    return HttpResponseRedirect(reverse("index"), id=id)
+
+@login_required
+def watchlistAdd(request, id):
+    user = request.user
+    if request.method == "POST" and user.is_authenticated:
+        listing = Listing.objects.get(pk=id)
+        user.Watchlist.add(listing)
+        message = "Added to your watchlist"
     else:
-        return render(request, "auctions/listing.html",{
-            "listing": listing
-        }) 
+        message = "You must be logged in"
+    return render(request, "auctions/listing.html",{
+        "listing": listing,
+        "message": message
+    })
 
+@login_required
 def watchlist(request):
-    return render(request, "auctions/watchlist.html")
+    user = request.user
+    return render(request, "auctions/watchlist.html",{
+    "watchlist": user.Watchlist.all()
+    })
 
-def bid(request):
-    return None
 
 def login_view(request):
     if request.method == "POST":
@@ -104,6 +122,7 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
+@login_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
