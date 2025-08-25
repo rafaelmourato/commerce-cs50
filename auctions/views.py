@@ -6,7 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing
+from .models import User, Listing, Bid
+
 
 class ListingForm(forms.Form):
     categories = [ ("",""),
@@ -56,7 +57,8 @@ def listing(request, id):
         if bid:
             bid2 = float(bid)
             if bid2 > listing.CurrentBid:
-                listing.Owner = request.user
+                newBid = Bid(Bidder=request.user, Value=bid2, Receiver=listing)
+                newBid.save()
                 listing.CurrentBid = bid
                 listing.save()
                 return render(request, "auctions/listing.html",{
