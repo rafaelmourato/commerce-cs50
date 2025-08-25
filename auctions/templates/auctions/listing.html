@@ -19,9 +19,12 @@
             <input type="submit" value="End Bidding">
         </form>
         {% elif listing.Active == True %}
-        <form action="{% url 'watchlistAdd' listing.id %}" method="POST">
+        {% if message%}
+        {{ message }}
+        {% endif %}
+        <form action="{% url 'watchlistToggle' listing.id %}" method="POST">
             {% csrf_token %}
-            <input type="submit" value="Add to watchlist">
+            <input type="submit" value="{% if listing in user.watchlist.all %}Remove from watchlist{% else %}Add to watchlist{% endif %}">
         </form>
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}

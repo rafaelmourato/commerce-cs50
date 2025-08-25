@@ -7,15 +7,14 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User, Listing, Bid
-
-
-class ListingForm(forms.Form):
-    categories = [ ("",""),
+categories = [ ("",""),
         ('Fash', 'Fashion'),
         ('Toys', 'Toys'),
         ('Elec', 'Electronics'),
         ( 'Home', 'Home'),
     ]
+
+class ListingForm(forms.Form):
     Title = forms.CharField(max_length=64)
     Description = forms.CharField(widget=forms.Textarea)
     CurrentBid = forms.DecimalField(max_digits = 10, decimal_places=2)
@@ -47,8 +46,20 @@ def create_listing(request):
             "form": ListingForm()
         })
 
-def categories(request):
-    return render(request, "auctions/categories.html")
+def categoriesList(request):
+    used_categories = Listing.objects.values_list("Category", flat=True).distinct()
+    filtered_categories = [item for item in categories if item[0] in used_categories]
+    return render(request, "auctions/categories.html",{
+        "categories": filtered_categories
+    })
+
+def categoryList(request, category):
+    listings = Listing.objects.filter(Category=category)
+    value = next((label for key, label in categories if key == category), category)
+    return render(request, "auctions/categories.html",{
+        "listings": listings,
+        "category": value
+    })
 
 def listing(request, id):
     listing = Listing.objects.get(pk=id)
@@ -82,12 +93,16 @@ def end_listing(request, id):
     return HttpResponseRedirect(reverse("index"), id=id)
 
 @login_required
-def watchlistAdd(request, id):
+def watchlist_toggle(request, id):
     user = request.user
     if request.method == "POST" and user.is_authenticated:
         listing = Listing.objects.get(pk=id)
-        user.Watchlist.add(listing)
-        message = "Added to your watchlist"
+        if listing not in user.Watchlist.all():
+            user.Watchlist.add(listing)
+            message = "Added to your watchlist"
+        else:    
+            user.Watchlist.remove(listing)
+            message = "Deleted from your watchlist"
     else:
         message = "You must be logged in"
     return render(request, "auctions/listing.html",{
