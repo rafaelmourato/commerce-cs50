@@ -14,7 +14,7 @@
         {% if error %}
             <h5>{{ error }}</h5>
         {% endif %}
-        {% if listing.Active == False%}
+        {% if listing.Active == False %}
             {% if listing.Winner == request.user %}
             <h1>You won!!</h1>
             {% elif listing.Owner == request.user %}
@@ -27,13 +27,13 @@
             <form action="{% url 'endlisting' listing.id%}">
                 <input type="submit" value="End Bidding">
             </form>
-        {% elif listing.Active == True %}
+        {% elif listing.Active == True and request.user.is_authenticated %}
             {% if message%}
                 {{ message }}
             {% endif %}
             <form action="{% url 'watchlistToggle' listing.id %}" method="POST">
             {% csrf_token %}
-            <input type="submit" value="{% if listing in user.watchlist.all %}Remove from watchlist{% else %}Add to watchlist{% endif %}">
+            <input type="submit" value="{% if listing in request.user.Watchlist.all %}Remove from watchlist{% else %}Add to watchlist{% endif %}">
             </form>
             <form action="{% url 'listing' listing.id %}" method="POST">
                 {% csrf_token %}
@@ -49,11 +49,13 @@
             {% endfor %}
             </ul>
         {% endif %}
+        {% if request.user.is_authenticated %}
         <form action="{% url 'commenting' listing.id %}" method="POST">
             {% csrf_token %}
             <input type="text" placeholder="Comment" name="comment">
             <input type="submit" value="Send">
         </form>
+        {% endif %}
     </div>
 
 </div>

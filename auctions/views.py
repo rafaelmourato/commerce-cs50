@@ -128,7 +128,7 @@ def watchlist(request):
     "watchlist": user.Watchlist.all()
     })
 
-def commenting(request,id):
+def commenting(request,id): 
     comment = request.POST.get("comment")
     listing = Listing.objects.get(pk=id)
     user = request.user
