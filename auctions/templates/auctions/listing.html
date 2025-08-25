@@ -14,24 +14,46 @@
         {% if error %}
             <h5>{{ error }}</h5>
         {% endif %}
-        {% if listing.Owner == request.user %}
-        <form action="{% url 'endlisting' listing.id%}">
-            <input type="submit" value="End Bidding">
-        </form>
-        {% elif listing.Active == True %}
-        {% if message%}
-        {{ message }}
+        {% if listing.Active == False%}
+            {% if listing.Winner == request.user %}
+            <h1>You won!!</h1>
+            {% elif listing.Owner == request.user %}
+            <h1>Enter in contact with {{ listing.Winner }}, who has won the bid.</h1>
+            {% else %}
+            <h1>Somebody outbidded you, better luck next time! </h1>
+            {% endif %}
         {% endif %}
-        <form action="{% url 'watchlistToggle' listing.id %}" method="POST">
+        {% if listing.Owner == request.user and listing.Active == True %}
+            <form action="{% url 'endlisting' listing.id%}">
+                <input type="submit" value="End Bidding">
+            </form>
+        {% elif listing.Active == True %}
+            {% if message%}
+                {{ message }}
+            {% endif %}
+            <form action="{% url 'watchlistToggle' listing.id %}" method="POST">
             {% csrf_token %}
             <input type="submit" value="{% if listing in user.watchlist.all %}Remove from watchlist{% else %}Add to watchlist{% endif %}">
-        </form>
-        <form action="{% url 'listing' listing.id %}" method="POST">
-            {% csrf_token %}
-            <input type="text" placeholder="Bid" name="bid">
-            <input type="submit" value="Place Bid">
-        </form>
+            </form>
+            <form action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                <input type="text" placeholder="Bid" name="bid">
+                <input type="submit" value="Place Bid">
+            </form>
         {% endif %}
+        {% if comments %}
+            <h3>Comments:</h3>
+            <ul>
+            {% for comment in comments %}
+                <li><b>{{ comment.Comenting.username }}</b>: {{ comment.Content }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        <form action="{% url 'commenting' listing.id %}" method="POST">
+            {% csrf_token %}
+            <input type="text" placeholder="Comment" name="comment">
+            <input type="submit" value="Send">
+        </form>
     </div>
 
 </div>

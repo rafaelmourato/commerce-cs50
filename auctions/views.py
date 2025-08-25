@@ -6,7 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Bid
+from .models import User, Listing, Bid, Comment
+
 categories = [ ("",""),
         ('Fash', 'Fashion'),
         ('Toys', 'Toys'),
@@ -63,6 +64,7 @@ def categoryList(request, category):
 
 def listing(request, id):
     listing = Listing.objects.get(pk=id)
+    comments = Comment.objects.filter(OnListing=listing)
     error = None
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -83,6 +85,7 @@ def listing(request, id):
             error = "You must login to bid"
     return render(request, "auctions/listing.html",{
         "listing": listing,
+        "comments": comments,
         "error": error
     })
 
@@ -90,7 +93,15 @@ def end_listing(request, id):
     listing = Listing.objects.get(pk=id)
     listing.Active = False
     listing.save()
-    return HttpResponseRedirect(reverse("index"), id=id)
+    return HttpResponseRedirect(reverse("listing", args=[id]))
+
+@login_required
+def mybids(request):
+    mybids = Bid.objects.filter(Bidder=request.user)
+    
+    return render(request, "auctions/mybids.html",{
+        "mybids": mybids
+    })
 
 @login_required
 def watchlist_toggle(request, id):
@@ -117,6 +128,15 @@ def watchlist(request):
     "watchlist": user.Watchlist.all()
     })
 
+def commenting(request,id):
+    comment = request.POST.get("comment")
+    listing = Listing.objects.get(pk=id)
+    user = request.user
+    new_comment = Comment(Comenting=user, OnListing=listing, Content=comment)
+    new_comment.save()
+    return HttpResponseRedirect(reverse("listing", args=[id]))
+
+    
 
 def login_view(request):
     if request.method == "POST":

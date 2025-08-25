@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html"%}
+
+{% block body %}
+    <h1>My Bids</h1>
+    <ul>
+    {% for bid in mybids %}
+        <li><a href="{% url 'listing' bid.Receiver.id %}">{{ bid.Receiver.Title }}</a> </li>
+        Your bid: ${{ bid.Value }}
+    {% endfor %}
+    </ul>
+{% endblock %}
