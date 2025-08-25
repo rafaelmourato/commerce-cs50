@@ -51,9 +51,31 @@ def categories(request):
 
 def listing(request, id):
     listing = Listing.objects.get(pk=id)
-    return render(request, "auctions/listing.html",{
-        "listing": listing
-    }) 
+    if request.method == "POST":
+        bid = request.POST.get("bid")
+        if bid:
+            bid2 = float(bid)
+            if bid2 > listing.CurrentBid:
+                listing.Owner = request.user
+                listing.CurrentBid = bid
+                listing.save()
+                return render(request, "auctions/listing.html",{
+                "listing": listing
+            })
+            else:
+                return render(request, "auctions/listing.html",{
+                "listing": listing,
+                "error": "Your bid must be higher than the current bid"
+            })
+        else:
+            return render(request, "auctions/listing.html",{
+                "listing": listing,
+                "error": "You must place a bid"
+            })
+    else:
+        return render(request, "auctions/listing.html",{
+            "listing": listing
+        }) 
 
 def watchlist(request):
     return render(request, "auctions/watchlist.html")
