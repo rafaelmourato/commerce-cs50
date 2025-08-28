@@ -2,17 +2,54 @@
 
 {% block body %}
     {% if categories %}
-        <h1>Categories</h1>
-        {% for key, value in categories %}
-            {% if key %}
-            <a href="{% url 'category' key %}">{{ value }}</a>
-            {% endif %}
-        {% endfor %}    
+    <div class="container">
+        <h1 class="mb-4">Categories</h1>
+        <div class="row">
+            {% for key, value in categories %}
+            <div class="col-1">
+                {% if key %}
+                <a href="{% url 'category' key %}" class="btn btn-primary" style="text-decoration: none;">{{ value }}</a>
+                {% endif %}
+            </div>
+            {% endfor %} 
+        </div> 
+    </div>  
     {% endif %}
     {% if listings %}
-        <h1>{{ category }}</h1>
+    <div class="container">
+        <h2 class=" mb-4">{{ category }} </h2>
         {% for listing in listings %}
-        <a href="{% url 'listing' listing.id %}">{{ listing.Title }}</a><br>
+        <div class="row mb-4 bg-light rounded">
+            <div class="col-4" style="min-height: 150px;">
+                {% if listing.Image %}
+                <img src="{{ listing.Image }}" alt="{{ listing.Title }} " class="img-fluid rounded ">
+                 {% else %}
+                <img src="https://onepullwire.com/wp-content/uploads/2020/10/0001.jpg" alt="{{ listing.Title }} " class="img-fluid rounded">
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark">
+                    <div class="container ms-3">
+                        <div class="row mt-4 mb-1">
+                        <h1>{{ listing.Title }}</h1>
+                        {% if not listing.Active %}
+                        <p style="color: rgb(200, 36, 36);">This listing has ended, enter for results. </p>
+                        {% endif %}
+                        </div>
+                        <div class="row ">
+                        <p> {{ listing.Description }} </p>
+                        </div>
+                        <div class="row">
+                        <p>Price: ${{ listing.CurrentBid|floatformat:2 }} </p>
+                        </div>
+                        <div class="row text-secondary">
+                        <p>Bids made: {{ listing.listingBid.count }} </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
         {% endfor %}
+    </div>
     {% endif %}
 {% endblock %}

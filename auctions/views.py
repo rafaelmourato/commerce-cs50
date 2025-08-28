@@ -32,16 +32,29 @@ def create_listing(request):
     if request.method == "POST":
         form = ListingForm(request.POST)
         if form.is_valid():
-            listing = Listing(
-                Owner=request.user,
-                Title=form.cleaned_data["Title"],
-                Description=form.cleaned_data["Description"],
-                CurrentBid=form.cleaned_data["CurrentBid"],
-                Image=form.cleaned_data["Image"],
-                Category=form.cleaned_data["Category"]
-            )
-            listing.save()
-            return HttpResponseRedirect(reverse("index"))
+            title = form.cleaned_data["Title"]
+            description = form.cleaned_data["Description"]
+            currentBid = form.cleaned_data["CurrentBid"]
+            if title and description and currentBid is not None:
+                listing = Listing(
+                    Owner=request.user,
+                    Title= title,
+                    Description=description,
+                    CurrentBid= currentBid,
+                    Image=form.cleaned_data["Image"],
+                    Category=form.cleaned_data["Category"]
+                )
+                listing.save()
+                return HttpResponseRedirect(reverse("index"))
+            else:
+                error = "Please fill the forms properly."
+        else:
+            error = "Please fill the forms properly."
+
+        return render(request, "auctions/createlisting.html", {
+            "form": form,
+            "error": error
+        })
     else:
         return render(request, "auctions/createlisting.html",{
             "form": ListingForm()
@@ -69,7 +82,7 @@ def listing(request, id):
     if request.method == "POST":
         if request.user.is_authenticated:
             bid = request.POST.get("bid")
-            if bid:
+            if bid and bid.isdigit():
                 bid2 = float(bid)
                 if bid2 > listing.CurrentBid:
                     newBid = Bid(Bidder=request.user, Value=bid2, Receiver=listing)
@@ -80,7 +93,7 @@ def listing(request, id):
                 else:
                     error = "Your bid must be higher than the current bid"
             else:
-                    error = "You must place a bid"
+                    error = "You must place a valid bid"
         else:
             error = "You must login to bid"
     return render(request, "auctions/listing.html",{
@@ -97,8 +110,7 @@ def end_listing(request, id):
 
 @login_required
 def mybids(request):
-    mybids = Bid.objects.filter(Bidder=request.user)
-    
+    mybids = Bid.objects.filter(Bidder=request.user).order_by('-id')    
     return render(request, "auctions/mybids.html",{
         "mybids": mybids
     })
@@ -106,8 +118,9 @@ def mybids(request):
 @login_required
 def watchlist_toggle(request, id):
     user = request.user
+    listing = Listing.objects.get(pk=id)
+    comments = Comment.objects.filter(OnListing=listing)
     if request.method == "POST" and user.is_authenticated:
-        listing = Listing.objects.get(pk=id)
         if listing not in user.Watchlist.all():
             user.Watchlist.add(listing)
             message = "Added to your watchlist"
@@ -118,7 +131,8 @@ def watchlist_toggle(request, id):
         message = "You must be logged in"
     return render(request, "auctions/listing.html",{
         "listing": listing,
-        "message": message
+        "message": message,
+        "comments":comments
     })
 
 @login_required
@@ -134,9 +148,7 @@ def commenting(request,id):
     user = request.user
     new_comment = Comment(Comenting=user, OnListing=listing, Content=comment)
     new_comment.save()
-    return HttpResponseRedirect(reverse("listing", args=[id]))
-
-    
+    return HttpResponseRedirect(reverse("listing", args=[id]))    
 
 def login_view(request):
     if request.method == "POST":

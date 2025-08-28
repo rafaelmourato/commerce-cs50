@@ -1,12 +1,24 @@
 {% extends "auctions/layout.html" %}
 
 {% block body%}
-
-<h2>Create Listing</h2>
-<form action="{% url 'createlisting' %}" method="POST">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit">
-</form>
+<div class="container">
+    <h2>Create Listing</h2>
+    {% if error %}
+    <p class="alert alert-danger w-50">{{ error }}</p>
+    {% endif %}
+    <form action="{% url 'createlisting' %}" method="POST">
+        {% csrf_token %}
+        <input type="text" class="form-control w-50 mb-1" name="Title" value="{{ form.Title.value|default:''  }}" placeholder="Title">
+        <textarea class="form-control w-50 mb-2" name="Description" placeholder="Description">{{ form.Description.value|default:''  }}</textarea>
+        <input type="number" class="form-control w-50 mb-1" name="CurrentBid" value="{{ form.CurrentBid.value }}" placeholder="Current Bid">
+        <input type="url" class="form-control w-50 mb-1" name="Image" value="{{ form.Image.value|default:''  }}" placeholder="Image URL">
+        <select class="form-select w-50 mb-2" name="Category" >
+            {% for value, label in form.Category.field.choices %}
+                <option value="{{ value }}" {% if form.Category.value == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" class="btn btn-primary mt-2">
+    </form>
+</div>
 
 {% endblock %}

@@ -1,8 +1,43 @@
 {% extends "auctions/layout.html"%}
 
 {% block body %}
-    <h1>watchlist</h1>
-    {% for item in watchlist %}
-    <a href="{% url 'listing' item.id %}">{{ item.Title }}</a>
-    {% endfor %}
+    <div class="container">
+        <h2 class=" mb-4">My Watchlist</h2>
+        {% for listing in watchlist %}
+        <div class="row mb-4 bg-light rounded">
+            <div class="col-4" style="min-height: 150px;">
+                {% if listing.Image %}
+                <img src="{{ listing.Image }}" alt="{{ listing.Title }} " class="img-fluid rounded ">
+                 {% else %}
+                <img src="https://onepullwire.com/wp-content/uploads/2020/10/0001.jpg" alt="{{ listing.Title }} " class="img-fluid rounded">
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark">
+                    <div class="container ms-3">
+                        <div class="row mt-4 mb-1">
+                        <h1>{{ listing.Title }}</h1>
+                        {% if not listing.Active %}
+                        <p style="color: rgb(200, 36, 36);">This listing has ended, enter for results. </p>
+                        {% endif %}
+                        </div>
+                        <div class="row ">
+                        <p> {{ listing.Description }} </p>
+                        </div>
+                        <div class="row">
+                        <p>Price: ${{ listing.CurrentBid|floatformat:2 }} </p>
+                        </div>
+                        <div class="row text-secondary">
+                        <p>Bids made: {{ listing.listingBid.count }} </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <p>You have no listings in your watchlist. Go check some:</p>
+        <a class="btn btn-sm btn-secondary" href="{% url 'index' %}">Active Listings</a>
+
+        {% endfor %}
+    </div>
 {% endblock %}

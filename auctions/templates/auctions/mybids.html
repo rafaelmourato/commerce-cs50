@@ -1,11 +1,43 @@
 {% extends "auctions/layout.html"%}
 
 {% block body %}
-    <h1>My Bids</h1>
-    <ul>
-    {% for bid in mybids %}
-        <li><a href="{% url 'listing' bid.Receiver.id %}">{{ bid.Receiver.Title }}</a> </li>
-        Your bid: ${{ bid.Value }}
-    {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>My Bids</h1>
+        {% for bid in mybids %}
+        <div class="row mb-4 bg-light rounded">
+                <div class="col-4" style="min-height: 150px;">
+                    {% if bid.Receiver.Image %}
+                    <img src="{{ bid.Receiver.Image }}" alt="{{ bid.Receiver.Title }} " class="img-fluid rounded ">
+                    {% else %}
+                    <img src="https://onepullwire.com/wp-content/uploads/2020/10/0001.jpg" alt="{{ bid.Receiver.Title }} " class="img-fluid rounded">
+                    {% endif %}
+                </div>
+                <div class="col-8">
+                    <a href="{% url 'listing' bid.Receiver.id %}" class="text-decoration-none text-dark">
+                        <div class="container ms-3">
+                            <div class="row mt-4 mb-1">
+                            <h1>{{ bid.Receiver.Title }}</h1>
+                            </div>
+                            {% if not bid.Receiver.Active %}
+                            <p style="color: rgb(200, 36, 36);">This listing has ended, enter for results. </p>
+                            {% endif %}
+                            <div class="row ">
+                            <p> {{ bid.Receiver.Description }} </p>
+                            </div>
+                            <div class="row">
+                            <p>Price: ${{ bid.Receiver.CurrentBid|floatformat:2 }} </p>
+                            </div>
+                            <div class="row text-secondary">
+                            <p>Your bid: ${{ bid.Value }} </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+        </div>
+        {% empty %}
+        <p>You have no bids made yet. You can make some:</p>
+        <a class="btn btn-sm btn-secondary" href="{% url 'index' %}">Active Listings</a>
+        {% endfor %}
+        </div>
+    </div>
 {% endblock %}

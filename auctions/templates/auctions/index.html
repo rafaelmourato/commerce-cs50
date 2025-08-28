@@ -2,20 +2,38 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-    {% for listing in listings %}
-    {% if listing.Active == True %}
-        <div>
-            <div>
-                <img src="{{ listing.Image }}" alt="{{ listing.Title }}">
+    <div class="container">
+        {% for listing in listings %}
+        <div class="row mb-4 bg-light rounded">
+        {% if listing.Active == True %}
+            <div class="col-4" style="min-height: 150px;">
+                {% if listing.Image %}
+                <img src="{{ listing.Image }}" alt="{{ listing.Title }} " class="img-fluid rounded ">
+                 {% else %}
+                <img src="https://onepullwire.com/wp-content/uploads/2020/10/0001.jpg" alt="{{ listing.Title }} " class="img-fluid rounded">
+                {% endif %}
             </div>
-            <a href="{% url 'listing' listing.id %}">
-                <div>
-                    <h3>{{ listing.Title }}</h3>
-                    <p>Price: {{ listing.CurrentBid }} </p>
-                    <p> {{ listing.Description }} </p>
-                </div>
-            </a>
+            <div class="col-8">
+                <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark">
+                    <div class="container ms-3">
+                        <div class="row mt-4 mb-1">
+                        <h1>{{ listing.Title }}</h1>
+                        </div>
+                        <div class="row ">
+                        <p> {{ listing.Description }} </p>
+                        </div>
+                        <div class="row">
+                        <p>Price: ${{ listing.CurrentBid|floatformat:2 }} </p>
+                        </div>
+                        <div class="row text-secondary">
+                        <p>Bids made: {{ listing.listingBid.count }} </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endif %}
         </div>
-    {% endif %}
-    {% endfor %}
+        {% endfor %}
+    </div>
+    
 {% endblock %}

@@ -1,63 +1,76 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-<h2>{{ listing.Title }}</h2>
 
-<div>
-    <div>
-        <img src="{{ listing.Image }}" alt="{{ listing.Title }}">
-    </div>
-    <div>
-        <h4> {{ listing.Description }} </h4>
-        <h4> {{ listing.Category }} </h4>
-        <h5> {{ listing.CurrentBid }} </h5>
+<div class="container">
+    <div class="row mb-3">
+        <h2>{{ listing.Title }}</h2>
         {% if error %}
-            <h5>{{ error }}</h5>
+            <p class="alert alert-danger w-50 p-1">{{ error }}</p>
         {% endif %}
         {% if listing.Active == False %}
             {% if listing.Winner == request.user %}
-            <h1>You won!!</h1>
+            <p class="alert alert-success w-50 p-2">You won!!</p>
             {% elif listing.Owner == request.user %}
-            <h1>Enter in contact with {{ listing.Winner }}, who has won the bid.</h1>
+            <p class="alert alert-warning w-50 p-2">Enter in contact with {{ listing.Winner }}, who has won the bid.</p>
             {% else %}
-            <h1>Somebody outbidded you, better luck next time! </h1>
+            <p class="alert alert-danger w-50 p-2">Somebody outbidded you, better luck next time! </p>
             {% endif %}
         {% endif %}
-        {% if listing.Owner == request.user and listing.Active == True %}
-            <form action="{% url 'endlisting' listing.id%}">
-                <input type="submit" value="End Bidding">
-            </form>
-        {% elif listing.Active == True and request.user.is_authenticated %}
-            {% if message%}
-                {{ message }}
-            {% endif %}
+    </div>
+    <div class="row mb-2">
+        <div class="col">
+        {% if listing.Image %}
+            <img src="{{ listing.Image }}" alt="{{ listing.Title }} " class="img-fluid rounded">
+        {% else %}
+            <img src="https://onepullwire.com/wp-content/uploads/2020/10/0001.jpg" alt="{{ listing.Title }} " class="img-fluid rounded">
+        {% endif %}
+        </div>
+        <div class="col">
+            <h4> {{ listing.Description }} </h4>
+            <h4> {{ listing.Category }} </h4>
+            <h5> ${{ listing.CurrentBid|floatformat:2 }} </h5>
+            {% if request.user.is_authenticated %}
             <form action="{% url 'watchlistToggle' listing.id %}" method="POST">
-            {% csrf_token %}
-            <input type="submit" value="{% if listing in request.user.Watchlist.all %}Remove from watchlist{% else %}Add to watchlist{% endif %}">
-            </form>
-            <form action="{% url 'listing' listing.id %}" method="POST">
                 {% csrf_token %}
-                <input type="text" placeholder="Bid" name="bid">
-                <input type="submit" value="Place Bid">
+                <input type="submit" class="btn btn-primary mb-2" value="{% if listing in request.user.Watchlist.all %}Remove from watchlist{% else %}Add to watchlist{% endif %}">
             </form>
-        {% endif %}
-        {% if comments %}
+            {% endif %}
+            {% if listing.Owner == request.user and listing.Active == True %}
+                <form action="{% url 'endlisting' listing.id%}">
+                    <input class="btn btn-primary mb-2" type="submit" value="End Bidding">
+                </form>
+            {% elif listing.Active == True and request.user.is_authenticated %}
+                {% if message%}
+                    {{ message }}
+                {% endif %}
+                <form action="{% url 'listing' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="text" class="form-control w-25 mb-1" placeholder="Bid" name="bid">
+                    <input type="submit" class="btn btn-primary" value="Place Bid">
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            {% if comments %}
             <h3>Comments:</h3>
             <ul>
             {% for comment in comments %}
                 <li><b>{{ comment.Comenting.username }}</b>: {{ comment.Content }}</li>
             {% endfor %}
             </ul>
-        {% endif %}
-        {% if request.user.is_authenticated %}
-        <form action="{% url 'commenting' listing.id %}" method="POST">
-            {% csrf_token %}
-            <input type="text" placeholder="Comment" name="comment">
-            <input type="submit" value="Send">
-        </form>
-        {% endif %}
+            {% endif %}
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'commenting' listing.id %}" method="POST">
+                {% csrf_token %}
+                <input type="text" class="form-control w-50 mb-1" placeholder="Comment" name="comment">
+                <input class="btn btn-primary " type="submit" value="Send">
+            </form>
+            {% endif %}
+
+        </div>
     </div>
-
 </div>
-
 {% endblock %}
