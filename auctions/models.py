@@ -20,7 +20,7 @@ class Listing(models.Model):
     Description = models.TextField(blank=True)
     CurrentBid = models.DecimalField(max_digits = 10, decimal_places=2)
     Image = models.URLField(max_length=500, blank=True, null=True)
-    Category = models.CharField(choices=categories, null=True, blank=True, default= None)
+    Category = models.CharField(choices=categories, null=True, blank=True, default= None, max_length=100)
     Active = models.BooleanField(default=True)
 
     def __str__(self):
