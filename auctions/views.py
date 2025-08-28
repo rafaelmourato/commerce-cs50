@@ -24,7 +24,7 @@ class ListingForm(forms.Form):
 
 def index(request):
     return render(request, "auctions/index.html",{
-        "listings": Listing.objects.all()
+        "listings": Listing.objects.all().order_by('-id')
     })
 
 @login_required
@@ -82,7 +82,7 @@ def listing(request, id):
     if request.method == "POST":
         if request.user.is_authenticated:
             bid = request.POST.get("bid")
-            if bid and bid.isdigit():
+            if bid and bid.count(".") <= 1 and all(c.isdigit() or c == "." for c in bid):
                 bid2 = float(bid)
                 if bid2 > listing.CurrentBid:
                     newBid = Bid(Bidder=request.user, Value=bid2, Receiver=listing)
